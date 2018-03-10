@@ -2,27 +2,29 @@ import DNA from './DNA.js';
 import util from './util.js';
 
 class Population {
-    constructor(t, m, populationSize) {
-        this.target = t;
+    constructor(m, populationSize) {
         this.mutationRate = m;
         this.generations = 0;
-        this.perfectScore = 1;
-        this.finished = false;
+        // this.perfectScore = 1;
+        // this.finished = false;
         this.matingPool = [];
-        this.best = '';
+        this.best = {};
 
         // Fill population with DNA instances
         this.population = Array(populationSize).fill(null);
-        this.population = this.population.map(() => new DNA(this.target.length));
+        this.population = this.population.map(() => new DNA());
 
         this.calcPopulationFitness();
     }
 
     // Calculate fitness value for every member of the population
     calcPopulationFitness() {
+        let res = [];
         this.population.forEach(member => {
-            member.calcFitness(this.target);
+            member.calcFitness();
+            res.push( member.genes.cleng );
         });
+        // console.log('res:', res);
     }
 
     // Generate a weighed mating pool
@@ -33,8 +35,11 @@ class Population {
 
         // Find the highest fitness value in the population
         this.population.forEach(member => {
+            // console.log(member.fitness);
             maxFitness = member.fitness > maxFitness ? member.fitness : maxFitness;
         });
+
+        // console.log('MAX:', maxFitness);
 
         // Based on fitness, each member is added to the mating pool a weighed number of times
         // higher fitness = more instance in pool = more likely to be picked as a parent
@@ -43,9 +48,12 @@ class Population {
             const fitness = util.map(member.fitness, 0, maxFitness, 0, 1);
             
             // Arbitrary multiplier
-            let n = Math.floor(fitness * 50);
+            let n = Math.floor(fitness * 10);
+
             for ( ; n >= 0; n--) {
-                this.matingPool.push(member);
+                if (member.fitness > maxFitness * 0.75) {
+                    this.matingPool.push(member);
+                }
             }
         });
     }
@@ -83,7 +91,7 @@ class Population {
     }
 
     evaluate() {
-        let worldrecord = 0.0;
+        let worldrecord = 0;
         let index = 0;
 
         // Find the fittest member of the population
@@ -94,16 +102,18 @@ class Population {
             }
         });
 
+        // console.log(Math.floor(worldrecord));
+
         // Get best result so far
         this.best = this.population[index].getPhrase();
 
         // Stop simulation if found result
-        if (worldrecord === this.perfectScore) this.finished = true;
+        // if (worldrecord === this.perfectScore) this.finished = true;
     }
 
-    isFinished() {
-        return this.finished;
-    }
+    // isFinished() {
+    //     return this.finished;
+    // }
 
     getGenerations() {
         return this.generations;
