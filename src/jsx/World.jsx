@@ -28,9 +28,9 @@ class World extends React.Component {
 
         // Simulation settings
         this.mutationRate = 0.01;
-        this.populationSize = 300;
+        this.populationSize = 10000;
 
-        this.maxGeneration = 10000;
+        this.maxGeneration = 1000;
         this.currentGeneration = 0;
 
         this.running = true;
@@ -65,11 +65,9 @@ class World extends React.Component {
         if (this.currentGeneration >= this.maxGeneration) this.running = false;
 
         // Display best result so far
-        this.setState({result: this.population.getBest()});
+        this.setState({result: this.population.getRandom()});
 
         this.currentGeneration++;
-
-        // console.log('BEST:' , this.state.result.cleng);
 
         // Loop and start new generation
         if (this.running) window.requestAnimationFrame(this.draw);

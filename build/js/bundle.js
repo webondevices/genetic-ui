@@ -21087,34 +21087,42 @@ var DNA = function () {
             // Initialise new child
             var child = new DNA();
 
-            var crossColors = function crossColors(a, b, w1, w2) {
-                // console.log('CROSS COLOR');
-                // console.log([a[0], b[0]], [w1, w2], '->', util.weightedMean([a[0], b[0]], [w1, w2]));
-                // console.log([a[1], b[1]], [w1, w2], '->', util.weightedMean([a[1], b[1]], [w1, w2]));
-                // console.log([a[2], b[2]], [w1, w2], '->', util.weightedMean([a[2], b[2]], [w1, w2]));
+            // const crossColors = (a, b, w1, w2) => {
+            //     // console.log('CROSS COLOR');
+            //     // console.log([a[0], b[0]], [w1, w2], '->', util.weightedMean([a[0], b[0]], [w1, w2]));
+            //     // console.log([a[1], b[1]], [w1, w2], '->', util.weightedMean([a[1], b[1]], [w1, w2]));
+            //     // console.log([a[2], b[2]], [w1, w2], '->', util.weightedMean([a[2], b[2]], [w1, w2]));
 
-                return [_util2.default.limit(_util2.default.weightedMean([a[0], b[0]], [w1, w2]), 0, 360), _util2.default.limit(_util2.default.weightedMean([a[1], b[1]], [w1, w2]), 0, 100), _util2.default.limit(_util2.default.weightedMean([a[2], b[2]], [w1, w2]), 0, 100)];
-            };
-            var decide = function decide() {
-                return Math.random() > 0.5;
-            };
+            //     return [
+            //         util.limit(util.weightedMean([a[0], b[0]], [w1, w2]), 0, 360),
+            //         util.limit(util.weightedMean([a[1], b[1]], [w1, w2]), 0, 100),
+            //         util.limit(util.weightedMean([a[2], b[2]], [w1, w2]), 0, 100)
+            //     ];
+            // };
+            // const decide = () => Math.random() > 0.5;
 
             // Cross DNA from two parents
-            child.genes = {
-                width: _util2.default.limit(_util2.default.weightedMean([this.genes.width, partner.genes.width], [this.scores.width, partner.scores.width]), 0, 100),
-                heigh: _util2.default.limit(_util2.default.weightedMean([this.genes.heigh, partner.genes.heigh], [this.scores.heigh, partner.scores.heigh]), 0, 100),
-                posit: this.fitness > partner.fitness ? this.genes.posit : partner.genes.posit,
-                anima: 'none',
-                backg: crossColors(this.genes.backg, partner.genes.backg, this.scores.backg, partner.scores.backg),
-                trans: _util2.default.limit(_util2.default.weightedMean([this.genes.trans, partner.genes.trans], [this.scores.trans, partner.scores.trans]), 0, 1),
-                fsize: _util2.default.limit(_util2.default.weightedMean([this.genes.fsize, partner.genes.fsize], [this.scores.fsize, partner.scores.fsize]), 6, 32),
-                fcolo: crossColors(this.genes.fcolo, partner.genes.fcolo, this.scores.fcolo, partner.scores.fcolo),
-                cleng: _util2.default.limit(_util2.default.weightedMean([this.genes.cleng, partner.genes.cleng], [this.scores.cleng, partner.scores.cleng]), 3, 100),
-                ctawi: _util2.default.limit(_util2.default.weightedMean([this.genes.ctawi, partner.genes.ctawi], [this.scores.ctawi, partner.scores.ctawi]), 0, 100),
-                ctahe: _util2.default.limit(_util2.default.weightedMean([this.genes.ctahe, partner.genes.ctahe], [this.scores.ctahe, partner.scores.ctahe]), 0, 100),
-                ctabg: crossColors(this.genes.ctabg, partner.genes.ctabg, this.scores.ctabg, partner.scores.ctabg),
-                ctafc: crossColors(this.genes.ctafc, partner.genes.ctafc, this.scores.ctafc, partner.scores.ctafc)
-            };
+            // child.genes = {
+            //     width: util.limit( util.weightedMean([this.genes.width, partner.genes.width], [this.scores.width, partner.scores.width]), 0, 100),
+            //     heigh: util.limit( util.weightedMean([this.genes.heigh, partner.genes.heigh], [this.scores.heigh, partner.scores.heigh]), 0, 100),
+            //     posit: this.fitness > partner.fitness ? this.genes.posit : partner.genes.posit,
+            //     anima: 'none',
+            //     backg: crossColors(this.genes.backg, partner.genes.backg, this.scores.backg, partner.scores.backg),
+            //     trans: util.limit( util.weightedMean([this.genes.trans, partner.genes.trans], [this.scores.trans, partner.scores.trans]), 0, 1),
+            //     fsize: util.limit( util.weightedMean([this.genes.fsize, partner.genes.fsize], [this.scores.fsize, partner.scores.fsize]), 6, 32),
+            //     fcolo: crossColors(this.genes.fcolo, partner.genes.fcolo, this.scores.fcolo, partner.scores.fcolo),
+            //     cleng: util.limit( util.weightedMean([this.genes.cleng, partner.genes.cleng], [this.scores.cleng, partner.scores.cleng]), 3, 100),
+            //     ctawi: util.limit( util.weightedMean([this.genes.ctawi, partner.genes.ctawi], [this.scores.ctawi, partner.scores.ctawi]), 0, 100),
+            //     ctahe: util.limit( util.weightedMean([this.genes.ctahe, partner.genes.ctahe], [this.scores.ctahe, partner.scores.ctahe]), 0, 100),
+            //     ctabg: crossColors(this.genes.ctabg, partner.genes.ctabg, this.scores.ctabg, partner.scores.ctabg),
+            //     ctafc: crossColors(this.genes.ctafc, partner.genes.ctafc, this.scores.ctafc, partner.scores.ctafc)
+            // };
+
+            if (this.fitness > partner.fitness) {
+                child.genes = Object.assign({}, this.genes);
+            } else {
+                child.genes = Object.assign({}, partner.genes);
+            }
 
             // console.log('CHILD', this.genes.cleng, partner.genes.cleng, '->' , child.genes.cleng);
 
@@ -21386,11 +21394,8 @@ var Population = function () {
 
             // Find the highest fitness value in the population
             this.population.forEach(function (member) {
-                // console.log(member.fitness);
                 maxFitness = member.fitness > maxFitness ? member.fitness : maxFitness;
             });
-
-            // console.log('MAX:', maxFitness);
 
             // Based on fitness, each member is added to the mating pool a weighed number of times
             // higher fitness = more instance in pool = more likely to be picked as a parent
@@ -21399,10 +21404,10 @@ var Population = function () {
                 var fitness = _util2.default.map(member.fitness, 0, maxFitness, 0, 1);
 
                 // Arbitrary multiplier
-                var n = Math.floor(fitness * 10);
+                var n = Math.floor(fitness * 50);
 
                 for (; n >= 0; n--) {
-                    if (member.fitness > maxFitness * 0.75) {
+                    if (member.fitness > maxFitness * 0.1) {
                         _this.matingPool.push(member);
                     }
                 }
@@ -21430,7 +21435,7 @@ var Population = function () {
                 var child = partnerA.crossover(partnerB);
 
                 // Mutate DNA for diversity
-                child.mutate(_this2.mutationRate);
+                // child.mutate(this.mutationRate);
 
                 // Add child to the population
                 _this2.population[i] = child;
@@ -21442,6 +21447,11 @@ var Population = function () {
         key: 'getBest',
         value: function getBest() {
             return this.best;
+        }
+    }, {
+        key: 'getRandom',
+        value: function getRandom() {
+            return this.population[Math.floor(Math.random() * this.population.length)].getPhrase();
         }
     }, {
         key: 'evaluate',
@@ -21553,9 +21563,9 @@ var World = function (_React$Component) {
 
         // Simulation settings
         _this.mutationRate = 0.01;
-        _this.populationSize = 300;
+        _this.populationSize = 10000;
 
-        _this.maxGeneration = 10000;
+        _this.maxGeneration = 1000;
         _this.currentGeneration = 0;
 
         _this.running = true;
@@ -21594,7 +21604,11 @@ var World = function (_React$Component) {
             if (this.currentGeneration >= this.maxGeneration) this.running = false;
 
             // Display best result so far
-            this.setState({ result: this.population.getBest() });
+            this.setState({ result: this.population.getRandom() });
+
+            console.log(this.population.population.map(function (item) {
+                return item.fitness;
+            }));
 
             this.currentGeneration++;
 

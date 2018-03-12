@@ -5,8 +5,6 @@ class Population {
     constructor(m, populationSize) {
         this.mutationRate = m;
         this.generations = 0;
-        // this.perfectScore = 1;
-        // this.finished = false;
         this.matingPool = [];
         this.best = {};
 
@@ -24,22 +22,17 @@ class Population {
             member.calcFitness();
             res.push( member.genes.cleng );
         });
-        // console.log('res:', res);
     }
 
     // Generate a weighed mating pool
     naturalSelection() {
         let maxFitness = 0;
-    
         this.matingPool = [];
 
         // Find the highest fitness value in the population
         this.population.forEach(member => {
-            // console.log(member.fitness);
             maxFitness = member.fitness > maxFitness ? member.fitness : maxFitness;
         });
-
-        // console.log('MAX:', maxFitness);
 
         // Based on fitness, each member is added to the mating pool a weighed number of times
         // higher fitness = more instance in pool = more likely to be picked as a parent
@@ -48,10 +41,10 @@ class Population {
             const fitness = util.map(member.fitness, 0, maxFitness, 0, 1);
             
             // Arbitrary multiplier
-            let n = Math.floor(fitness * 10);
+            let n = Math.floor(fitness * 50);
 
             for ( ; n >= 0; n--) {
-                if (member.fitness > maxFitness * 0.75) {
+                if (member.fitness > maxFitness * 0.1) {
                     this.matingPool.push(member);
                 }
             }
@@ -75,7 +68,7 @@ class Population {
             const child = partnerA.crossover(partnerB);
 
             // Mutate DNA for diversity
-            child.mutate(this.mutationRate);
+            // child.mutate(this.mutationRate);
 
             // Add child to the population
             this.population[i] = child;
@@ -90,6 +83,10 @@ class Population {
         return this.best;
     }
 
+    getRandom() {
+        return this.population[Math.floor(Math.random() * this.population.length)].getPhrase();
+    }
+
     evaluate() {
         let worldrecord = 0;
         let index = 0;
@@ -102,18 +99,10 @@ class Population {
             }
         });
 
-        // console.log(Math.floor(worldrecord));
-
         // Get best result so far
         this.best = this.population[index].getPhrase();
 
-        // Stop simulation if found result
-        // if (worldrecord === this.perfectScore) this.finished = true;
     }
-
-    // isFinished() {
-    //     return this.finished;
-    // }
 
     getGenerations() {
         return this.generations;

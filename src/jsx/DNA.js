@@ -95,11 +95,6 @@ class DNA {
 
     // Fitness function (returns floating point % of "correct" characters)
     calcFitness() {
-        // const backgHSL = util.rgbToHsl(this.genes.backg[0], this.genes.backg[1], this.genes.backg[2]);
-        // const fcoloHSL = util.rgbToHsl(this.genes.fcolo[0], this.genes.fcolo[1], this.genes.fcolo[2]);
-        // const ctabgHSL = util.rgbToHsl(this.genes.ctabg[0], this.genes.ctabg[1], this.genes.ctabg[2]);
-        // const ctafcHSL = util.rgbToHsl(this.genes.ctafc[0], this.genes.ctafc[1], this.genes.ctafc[2]);
-
         const getFontScore = (size, max) => {
             if (size > max) {
                 const score = 100 - (size - max) * (100 / max);
@@ -125,15 +120,9 @@ class DNA {
             ctafc: (Math.abs(this.genes.ctabg[2] - this.genes.ctafc[2]))
         };
 
-        // if (this.scores.backg < 0) {
-        //    console.log('-SCORE', this.genes.backg, this.scores.backg, this.genes.backg);
-        // }
-
         for (var score in this.scores) {
             this.fitness = this.fitness + this.scores[score];
         }
-
-        // console.log(this.fitness);
     }
 
     // Cross DNA with partner to produce child
@@ -142,49 +131,11 @@ class DNA {
         // Initialise new child
         const child = new DNA();
 
-        const crossColors = (a, b, w1, w2) => {
-            // console.log('CROSS COLOR');
-            // console.log([a[0], b[0]], [w1, w2], '->', util.weightedMean([a[0], b[0]], [w1, w2]));
-            // console.log([a[1], b[1]], [w1, w2], '->', util.weightedMean([a[1], b[1]], [w1, w2]));
-            // console.log([a[2], b[2]], [w1, w2], '->', util.weightedMean([a[2], b[2]], [w1, w2]));
-
-            return [
-                util.limit(util.weightedMean([a[0], b[0]], [w1, w2]), 0, 360),
-                util.limit(util.weightedMean([a[1], b[1]], [w1, w2]), 0, 100),
-                util.limit(util.weightedMean([a[2], b[2]], [w1, w2]), 0, 100)
-            ];
-        };
-        const decide = () => Math.random() > 0.5;
-
-        // Cross DNA from two parents
-        child.genes = {
-            width: util.limit( util.weightedMean([this.genes.width, partner.genes.width], [this.scores.width, partner.scores.width]), 0, 100),
-            heigh: util.limit( util.weightedMean([this.genes.heigh, partner.genes.heigh], [this.scores.heigh, partner.scores.heigh]), 0, 100),
-            posit: this.fitness > partner.fitness ? this.genes.posit : partner.genes.posit,
-            anima: 'none',
-            backg: crossColors(this.genes.backg, partner.genes.backg, this.scores.backg, partner.scores.backg),
-            trans: util.limit( util.weightedMean([this.genes.trans, partner.genes.trans], [this.scores.trans, partner.scores.trans]), 0, 1),
-            fsize: util.limit( util.weightedMean([this.genes.fsize, partner.genes.fsize], [this.scores.fsize, partner.scores.fsize]), 6, 32),
-            fcolo: crossColors(this.genes.fcolo, partner.genes.fcolo, this.scores.fcolo, partner.scores.fcolo),
-            cleng: util.limit( util.weightedMean([this.genes.cleng, partner.genes.cleng], [this.scores.cleng, partner.scores.cleng]), 3, 100),
-            ctawi: util.limit( util.weightedMean([this.genes.ctawi, partner.genes.ctawi], [this.scores.ctawi, partner.scores.ctawi]), 0, 100),
-            ctahe: util.limit( util.weightedMean([this.genes.ctahe, partner.genes.ctahe], [this.scores.ctahe, partner.scores.ctahe]), 0, 100),
-            ctabg: crossColors(this.genes.ctabg, partner.genes.ctabg, this.scores.ctabg, partner.scores.ctabg),
-            ctafc: crossColors(this.genes.ctafc, partner.genes.ctafc, this.scores.ctafc, partner.scores.ctafc)
-        };
-
-        // console.log('CHILD', this.genes.cleng, partner.genes.cleng, '->' , child.genes.cleng);
-
-        // if (child.genes.backg [0] < 0 || child.genes.backg [1] < 0 || child.genes.backg [2] < 0) {
-        //     console.log('CHILD', this.genes.backg, partner.genes.backg, '->' , child.genes.backg);
-        //     console.log('CROSS COLOR');
-        //     console.log([this.genes.backg[0], partner.genes.backg[0]], [this.scores.backg, partner.scores.backg], '->', util.weightedMean([this.genes.backg[0], partner.genes.backg[0]], [this.scores.backg, partner.scores.backg]));
-        //     console.log([this.genes.backg[1], partner.genes.backg[1]], [this.scores.backg, partner.scores.backg], '->', util.weightedMean([this.genes.backg[1], partner.genes.backg[1]], [this.scores.backg, partner.scores.backg]));
-        //     console.log([this.genes.backg[2], partner.genes.backg[2]], [this.scores.backg, partner.scores.backg], '->', util.weightedMean([this.genes.backg[2], partner.genes.backg[2]], [this.scores.backg, partner.scores.backg]));
-        // }
-
-        // console.log('util.weightedMean([' + this.genes.cleng, partner.genes.cleng + '], [' + this.scores.cleng, partner.scores.cleng + '])');
-        // console.log(util.weightedMean([this.genes.cleng, partner.genes.cleng], [this.scores.cleng, partner.scores.cleng]));
+        if (this.fitness > partner.fitness) {
+            child.genes = Object.assign({}, this.genes);
+        } else {
+            child.genes = Object.assign({}, partner.genes);
+        }
 
         child.calcFitness();
         
