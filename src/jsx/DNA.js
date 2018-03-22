@@ -17,8 +17,11 @@ class DNA {
             ctawi: 0,
             ctahe: 0,
             ctabg: [],
-            ctafc: []
+            ctafc: [],
+            cexpr: ''
         };
+
+        this.message = 
 
         this.weights = {
             width: 1,
@@ -39,7 +42,8 @@ class DNA {
             ctawi: 1,
             ctahe: 1,
             ctabg: 1,
-            ctafc: 1
+            ctafc: 1,
+            cexpr: 1
         };
 
         this.scores = {
@@ -55,21 +59,33 @@ class DNA {
             ctawi: 0,
             ctahe: 0,
             ctabg: 0,
-            ctafc: 0
+            ctafc: 0,
+            cexpr: 0
         };
 
         this.fitness = 0;
 
-        this.directions = ['top', 'right', 'bottom', 'left'];
+        this.directions = ['bottom', 'bottom', 'bottom', 'bottom'];
         
         // Random DNA generated from characters
         this.genes = this.getRandomGene();
 
     }
 
+    getText (length) {
+        var text = '';
+        var possible = 'ABCDE FGHIJ KLMNO PQRST UVWXY Zabcd efghi jklmn opqrst uvwxyz 01234 56789';
+      
+        for (var i = 0; i <= length; i++)
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+      
+        return text;
+    }
+
     getRandomGene() {
         const getColor = () => Math.floor(Math.random() * 360);
         const getPercentage = () => Math.floor(Math.random() * 100);
+        const clengValue = Math.floor(Math.random() * 100);
 
         return {
             width: Math.random() * 100,
@@ -80,11 +96,12 @@ class DNA {
             trans: Math.random(),
             fsize: Math.floor(Math.random() * 100),
             fcolo: [getColor(), getPercentage(), getPercentage()],
-            cleng: Math.floor(Math.random() * 100),
+            cleng: clengValue,
             ctawi: Math.random() * 100,
             ctahe: Math.random() * 100,
             ctabg: [getColor(), getPercentage(), getPercentage()],
-            ctafc: [getColor(), getPercentage(), getPercentage()]
+            ctafc: [getColor(), getPercentage(), getPercentage()],
+            cexpr: this.getText(clengValue)
         };
     }
 
@@ -117,8 +134,11 @@ class DNA {
             ctawi: (this.genes.ctawi* this.weights.ctawi),
             ctahe: (this.genes.ctahe* this.weights.ctahe),
             ctabg: (100 - (Math.abs(this.genes.ctabg[2] - 50) + (50 - (this.genes.ctabg[1] / 2)))),
-            ctafc: (Math.abs(this.genes.ctabg[2] - this.genes.ctafc[2]))
+            ctafc: (Math.abs(this.genes.ctabg[2] - this.genes.ctafc[2])),
+            cexpr: (100 - this.genes.cleng < 0 ? 0 : 100 - this.genes.cleng)
         };
+
+        this.fitness = 0;
 
         for (var score in this.scores) {
             this.fitness = this.fitness + this.scores[score];
@@ -134,11 +154,12 @@ class DNA {
         if (this.fitness > partner.fitness) {
             child.genes = Object.assign({}, this.genes);
         } else {
-            child.genes = Object.assign({}, partner.genes);
+            child.genes = Object.assign({}, this.genes);
         }
 
-        child.calcFitness();
         
+        child.calcFitness();
+
         return child;
     }
 
@@ -185,6 +206,9 @@ class DNA {
                     break;
                 case 'ctafc':
                     if (Math.random() < mutationRate)  this.genes.ctafc = [this.genes.ctafc[0] + (this.genes.ctafc[0] * mutationScale), this.genes.ctafc[1] + (this.genes.ctafc[1] * mutationScale), this.genes.ctafc[2] + (this.genes.ctafc[2] * mutationScale)];
+                    break;
+                case 'cexpr':
+                    // if (Math.random() < mutationRate)  this.genes.ctafc = [this.genes.ctafc[0] + (this.genes.ctafc[0] * mutationScale), this.genes.ctafc[1] + (this.genes.ctafc[1] * mutationScale), this.genes.ctafc[2] + (this.genes.ctafc[2] * mutationScale)];
                     break;
             }
         }

@@ -2,18 +2,8 @@ import React from 'react';
 
 class Element extends React.Component {
 
-    getText (length) {
-        var text = '';
-        var possible = 'ABCDE FGHIJ KLMNO PQRST UVWXY Zabcd efghi jklmn opqrst uvwxyz 01234 56789';
-      
-        for (var i = 0; i <= length; i++)
-          text += possible.charAt(Math.floor(Math.random() * possible.length));
-      
-        return text;
-    }
-
     render () {
-        const {width,heigh,posit,anima,backg,trans,fsize,fcolo,cleng,ctawi,ctahe,ctabg,ctafc} = this.props.dna;
+        const {width,heigh,posit,anima,backg,trans,fsize,fcolo,cleng,ctawi,ctahe,ctabg,ctafc,cexpr} = this.props.dna;
         const getLeft = () => {
             if (posit === 'left') { return '0';}
             if (posit === 'right') { return `calc(100% - ${width}vw)`;}
@@ -47,11 +37,9 @@ class Element extends React.Component {
             color: `hsl(${Math.floor(ctafc[0])},${Math.floor(ctafc[1])}%,${Math.floor(ctafc[2])}%)`
         };
 
-        const paragraphText = this.getText(cleng);
-
         return (
             <div className="container" style={containerStyle}>
-                <p className="container-text" style={textStyle}>{paragraphText}</p>
+                <p className="container-text" style={textStyle}>{cexpr}</p>
                 <button className="container-button" style={buttonStyle}>Click me!</button>
             </div>
         );

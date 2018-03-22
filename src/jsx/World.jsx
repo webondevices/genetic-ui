@@ -28,7 +28,7 @@ class World extends React.Component {
 
         // Simulation settings
         this.mutationRate = 0.01;
-        this.populationSize = 10000;
+        this.populationSize = 1000;
 
         this.maxGeneration = 1000;
         this.currentGeneration = 0;
@@ -49,9 +49,14 @@ class World extends React.Component {
 
     draw() {
 
+        // console.log('Gen: ', this.currentGeneration);
+        // console.log('Worst fitness: ', this.population.getLowestFitness(), 'Length: ', this.population.population.length);
+
+        // console.log('Natural selection');
         // Generate weighed mating pool with the fittest members
         this.population.naturalSelection();
 
+        // console.log('Generate pool');
         // Generate new population of children from parents in the mating pool
         this.population.generate();
 
@@ -62,15 +67,16 @@ class World extends React.Component {
         this.population.evaluate();
 
         // If max reached, stop
-        if (this.currentGeneration >= this.maxGeneration) this.running = false;
+        if (this.currentGeneration + 1 > this.maxGeneration - 2) this.running = false;
 
         // Display best result so far
-        this.setState({result: this.population.getRandom()});
+        this.setState({result: this.population.getLowest()});
 
         this.currentGeneration++;
 
         // Loop and start new generation
         if (this.running) window.requestAnimationFrame(this.draw);
+        // if (this.running) setTimeout(this.draw, 10);
     }
 
     render() {
@@ -78,6 +84,9 @@ class World extends React.Component {
 
         return (
             <div>
+                <div className="generation">No. iterations: <span>{this.currentGeneration}</span></div>
+                <div className="population">Variations left: <span>{this.population.population.length}</span></div>
+                <div className="score">Lowest fitness score: <span>{Math.floor(this.population.getLowestFitness())}</span></div>
                 <Element dna={this.state.result} />
             </div>
         );

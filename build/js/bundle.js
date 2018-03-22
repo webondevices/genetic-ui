@@ -20948,10 +20948,11 @@ var DNA = function () {
             ctawi: 0,
             ctahe: 0,
             ctabg: [],
-            ctafc: []
+            ctafc: [],
+            cexpr: ''
         };
 
-        this.weights = {
+        this.message = this.weights = {
             width: 1,
             heigh: 1,
             posit: 1,
@@ -20970,7 +20971,8 @@ var DNA = function () {
             ctawi: 1,
             ctahe: 1,
             ctabg: 1,
-            ctafc: 1
+            ctafc: 1,
+            cexpr: 1
         };
 
         this.scores = {
@@ -20986,18 +20988,29 @@ var DNA = function () {
             ctawi: 0,
             ctahe: 0,
             ctabg: 0,
-            ctafc: 0
+            ctafc: 0,
+            cexpr: 0
         };
 
         this.fitness = 0;
 
-        this.directions = ['top', 'right', 'bottom', 'left'];
+        this.directions = ['bottom', 'bottom', 'bottom', 'bottom'];
 
         // Random DNA generated from characters
         this.genes = this.getRandomGene();
     }
 
     _createClass(DNA, [{
+        key: 'getText',
+        value: function getText(length) {
+            var text = '';
+            var possible = 'ABCDE FGHIJ KLMNO PQRST UVWXY Zabcd efghi jklmn opqrst uvwxyz 01234 56789';
+
+            for (var i = 0; i <= length; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }return text;
+        }
+    }, {
         key: 'getRandomGene',
         value: function getRandomGene() {
             var getColor = function getColor() {
@@ -21006,6 +21019,7 @@ var DNA = function () {
             var getPercentage = function getPercentage() {
                 return Math.floor(Math.random() * 100);
             };
+            var clengValue = Math.floor(Math.random() * 100);
 
             return {
                 width: Math.random() * 100,
@@ -21016,11 +21030,12 @@ var DNA = function () {
                 trans: Math.random(),
                 fsize: Math.floor(Math.random() * 100),
                 fcolo: [getColor(), getPercentage(), getPercentage()],
-                cleng: Math.floor(Math.random() * 100),
+                cleng: clengValue,
                 ctawi: Math.random() * 100,
                 ctahe: Math.random() * 100,
                 ctabg: [getColor(), getPercentage(), getPercentage()],
-                ctafc: [getColor(), getPercentage(), getPercentage()]
+                ctafc: [getColor(), getPercentage(), getPercentage()],
+                cexpr: this.getText(clengValue)
             };
         }
 
@@ -21037,11 +21052,6 @@ var DNA = function () {
     }, {
         key: 'calcFitness',
         value: function calcFitness() {
-            // const backgHSL = util.rgbToHsl(this.genes.backg[0], this.genes.backg[1], this.genes.backg[2]);
-            // const fcoloHSL = util.rgbToHsl(this.genes.fcolo[0], this.genes.fcolo[1], this.genes.fcolo[2]);
-            // const ctabgHSL = util.rgbToHsl(this.genes.ctabg[0], this.genes.ctabg[1], this.genes.ctabg[2]);
-            // const ctafcHSL = util.rgbToHsl(this.genes.ctafc[0], this.genes.ctafc[1], this.genes.ctafc[2]);
-
             var getFontScore = function getFontScore(size, max) {
                 if (size > max) {
                     var _score = 100 - (size - max) * (100 / max);
@@ -21064,18 +21074,15 @@ var DNA = function () {
                 ctawi: this.genes.ctawi * this.weights.ctawi,
                 ctahe: this.genes.ctahe * this.weights.ctahe,
                 ctabg: 100 - (Math.abs(this.genes.ctabg[2] - 50) + (50 - this.genes.ctabg[1] / 2)),
-                ctafc: Math.abs(this.genes.ctabg[2] - this.genes.ctafc[2])
+                ctafc: Math.abs(this.genes.ctabg[2] - this.genes.ctafc[2]),
+                cexpr: 100 - this.genes.cleng < 0 ? 0 : 100 - this.genes.cleng
             };
 
-            // if (this.scores.backg < 0) {
-            //    console.log('-SCORE', this.genes.backg, this.scores.backg, this.genes.backg);
-            // }
+            this.fitness = 0;
 
             for (var score in this.scores) {
                 this.fitness = this.fitness + this.scores[score];
             }
-
-            // console.log(this.fitness);
         }
 
         // Cross DNA with partner to produce child
@@ -21087,55 +21094,11 @@ var DNA = function () {
             // Initialise new child
             var child = new DNA();
 
-            // const crossColors = (a, b, w1, w2) => {
-            //     // console.log('CROSS COLOR');
-            //     // console.log([a[0], b[0]], [w1, w2], '->', util.weightedMean([a[0], b[0]], [w1, w2]));
-            //     // console.log([a[1], b[1]], [w1, w2], '->', util.weightedMean([a[1], b[1]], [w1, w2]));
-            //     // console.log([a[2], b[2]], [w1, w2], '->', util.weightedMean([a[2], b[2]], [w1, w2]));
-
-            //     return [
-            //         util.limit(util.weightedMean([a[0], b[0]], [w1, w2]), 0, 360),
-            //         util.limit(util.weightedMean([a[1], b[1]], [w1, w2]), 0, 100),
-            //         util.limit(util.weightedMean([a[2], b[2]], [w1, w2]), 0, 100)
-            //     ];
-            // };
-            // const decide = () => Math.random() > 0.5;
-
-            // Cross DNA from two parents
-            // child.genes = {
-            //     width: util.limit( util.weightedMean([this.genes.width, partner.genes.width], [this.scores.width, partner.scores.width]), 0, 100),
-            //     heigh: util.limit( util.weightedMean([this.genes.heigh, partner.genes.heigh], [this.scores.heigh, partner.scores.heigh]), 0, 100),
-            //     posit: this.fitness > partner.fitness ? this.genes.posit : partner.genes.posit,
-            //     anima: 'none',
-            //     backg: crossColors(this.genes.backg, partner.genes.backg, this.scores.backg, partner.scores.backg),
-            //     trans: util.limit( util.weightedMean([this.genes.trans, partner.genes.trans], [this.scores.trans, partner.scores.trans]), 0, 1),
-            //     fsize: util.limit( util.weightedMean([this.genes.fsize, partner.genes.fsize], [this.scores.fsize, partner.scores.fsize]), 6, 32),
-            //     fcolo: crossColors(this.genes.fcolo, partner.genes.fcolo, this.scores.fcolo, partner.scores.fcolo),
-            //     cleng: util.limit( util.weightedMean([this.genes.cleng, partner.genes.cleng], [this.scores.cleng, partner.scores.cleng]), 3, 100),
-            //     ctawi: util.limit( util.weightedMean([this.genes.ctawi, partner.genes.ctawi], [this.scores.ctawi, partner.scores.ctawi]), 0, 100),
-            //     ctahe: util.limit( util.weightedMean([this.genes.ctahe, partner.genes.ctahe], [this.scores.ctahe, partner.scores.ctahe]), 0, 100),
-            //     ctabg: crossColors(this.genes.ctabg, partner.genes.ctabg, this.scores.ctabg, partner.scores.ctabg),
-            //     ctafc: crossColors(this.genes.ctafc, partner.genes.ctafc, this.scores.ctafc, partner.scores.ctafc)
-            // };
-
             if (this.fitness > partner.fitness) {
                 child.genes = Object.assign({}, this.genes);
             } else {
-                child.genes = Object.assign({}, partner.genes);
+                child.genes = Object.assign({}, this.genes);
             }
-
-            // console.log('CHILD', this.genes.cleng, partner.genes.cleng, '->' , child.genes.cleng);
-
-            // if (child.genes.backg [0] < 0 || child.genes.backg [1] < 0 || child.genes.backg [2] < 0) {
-            //     console.log('CHILD', this.genes.backg, partner.genes.backg, '->' , child.genes.backg);
-            //     console.log('CROSS COLOR');
-            //     console.log([this.genes.backg[0], partner.genes.backg[0]], [this.scores.backg, partner.scores.backg], '->', util.weightedMean([this.genes.backg[0], partner.genes.backg[0]], [this.scores.backg, partner.scores.backg]));
-            //     console.log([this.genes.backg[1], partner.genes.backg[1]], [this.scores.backg, partner.scores.backg], '->', util.weightedMean([this.genes.backg[1], partner.genes.backg[1]], [this.scores.backg, partner.scores.backg]));
-            //     console.log([this.genes.backg[2], partner.genes.backg[2]], [this.scores.backg, partner.scores.backg], '->', util.weightedMean([this.genes.backg[2], partner.genes.backg[2]], [this.scores.backg, partner.scores.backg]));
-            // }
-
-            // console.log('util.weightedMean([' + this.genes.cleng, partner.genes.cleng + '], [' + this.scores.cleng, partner.scores.cleng + '])');
-            // console.log(util.weightedMean([this.genes.cleng, partner.genes.cleng], [this.scores.cleng, partner.scores.cleng]));
 
             child.calcFitness();
 
@@ -21189,6 +21152,9 @@ var DNA = function () {
                     case 'ctafc':
                         if (Math.random() < mutationRate) this.genes.ctafc = [this.genes.ctafc[0] + this.genes.ctafc[0] * mutationScale, this.genes.ctafc[1] + this.genes.ctafc[1] * mutationScale, this.genes.ctafc[2] + this.genes.ctafc[2] * mutationScale];
                         break;
+                    case 'cexpr':
+                        // if (Math.random() < mutationRate)  this.genes.ctafc = [this.genes.ctafc[0] + (this.genes.ctafc[0] * mutationScale), this.genes.ctafc[1] + (this.genes.ctafc[1] * mutationScale), this.genes.ctafc[2] + (this.genes.ctafc[2] * mutationScale)];
+                        break;
                 }
             }
         }
@@ -21230,16 +21196,6 @@ var Element = function (_React$Component) {
     }
 
     _createClass(Element, [{
-        key: 'getText',
-        value: function getText(length) {
-            var text = '';
-            var possible = 'ABCDE FGHIJ KLMNO PQRST UVWXY Zabcd efghi jklmn opqrst uvwxyz 01234 56789';
-
-            for (var i = 0; i <= length; i++) {
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-            }return text;
-        }
-    }, {
         key: 'render',
         value: function render() {
             var _props$dna = this.props.dna,
@@ -21255,7 +21211,8 @@ var Element = function (_React$Component) {
                 ctawi = _props$dna.ctawi,
                 ctahe = _props$dna.ctahe,
                 ctabg = _props$dna.ctabg,
-                ctafc = _props$dna.ctafc;
+                ctafc = _props$dna.ctafc,
+                cexpr = _props$dna.cexpr;
 
             var getLeft = function getLeft() {
                 if (posit === 'left') {
@@ -21302,15 +21259,13 @@ var Element = function (_React$Component) {
                 color: 'hsl(' + Math.floor(ctafc[0]) + ',' + Math.floor(ctafc[1]) + '%,' + Math.floor(ctafc[2]) + '%)'
             };
 
-            var paragraphText = this.getText(cleng);
-
             return _react2.default.createElement(
                 'div',
                 { className: 'container', style: containerStyle },
                 _react2.default.createElement(
                     'p',
                     { className: 'container-text', style: textStyle },
-                    paragraphText
+                    cexpr
                 ),
                 _react2.default.createElement(
                     'button',
@@ -21353,10 +21308,9 @@ var Population = function () {
 
         this.mutationRate = m;
         this.generations = 0;
-        // this.perfectScore = 1;
-        // this.finished = false;
         this.matingPool = [];
         this.best = {};
+        this.lowestFitness = 0;
 
         // Fill population with DNA instances
         this.population = Array(populationSize).fill(null);
@@ -21373,12 +21327,10 @@ var Population = function () {
     _createClass(Population, [{
         key: 'calcPopulationFitness',
         value: function calcPopulationFitness() {
-            var res = [];
             this.population.forEach(function (member) {
                 member.calcFitness();
-                res.push(member.genes.cleng);
+                // console.log(member.fitness);
             });
-            // console.log('res:', res);
         }
 
         // Generate a weighed mating pool
@@ -21386,32 +21338,35 @@ var Population = function () {
     }, {
         key: 'naturalSelection',
         value: function naturalSelection() {
-            var _this = this;
-
-            var maxFitness = 0;
-
+            // let maxFitness = 0;
             this.matingPool = [];
 
             // Find the highest fitness value in the population
-            this.population.forEach(function (member) {
-                maxFitness = member.fitness > maxFitness ? member.fitness : maxFitness;
-            });
+            // this.population.forEach(member => {
+            //     maxFitness = member.fitness > maxFitness ? member.fitness : maxFitness;
+            // });
 
             // Based on fitness, each member is added to the mating pool a weighed number of times
             // higher fitness = more instance in pool = more likely to be picked as a parent
             // lower fitness = less instance in pool = less likely to be picked as a parent
-            this.population.forEach(function (member) {
-                var fitness = _util2.default.map(member.fitness, 0, maxFitness, 0, 1);
+            // this.population.forEach(member => {
+            //     const fitness = util.map(member.fitness, 0, maxFitness, 0, 1);
 
-                // Arbitrary multiplier
-                var n = Math.floor(fitness * 50);
+            //     // Arbitrary multiplier
+            //     // let n = Math.floor(fitness * 50);
+            //     let n = Math.floor(fitness / 100);
 
-                for (; n >= 0; n--) {
-                    if (member.fitness > maxFitness * 0.1) {
-                        _this.matingPool.push(member);
-                    }
-                }
-            });
+            //     for ( ; n >= 0; n--) {
+            //         // console.log('member.fitness ', member.fitness, ' > cutoff ', maxFitness * 0.75);
+            //         if (member.fitness > this.lowestFitness * 1.25) {
+            //             // console.log('IN')
+            //             this.matingPool.push(member);
+            //         }
+            //     }
+            // });
+
+            this.matingPool = this.population;
+            this.removeLowestFitnessFromPool();
         }
 
         // Create a new generation
@@ -21419,27 +21374,29 @@ var Population = function () {
     }, {
         key: 'generate',
         value: function generate() {
-            var _this2 = this;
 
-            this.population.forEach(function (member, i) {
+            // this.population.forEach((member, i) => {
 
-                // Random index for the pool
-                var a = _util2.default.randomInt(0, _this2.matingPool.length - 1);
-                var b = _util2.default.randomInt(0, _this2.matingPool.length - 1);
+            //     // Random index for the pool
+            //     const a = util.randomInt(0, this.matingPool.length - 1);
+            //     const b = util.randomInt(0, this.matingPool.length - 1);
 
-                // Picking a random item from the pool
-                var partnerA = _this2.matingPool[a];
-                var partnerB = _this2.matingPool[b];
+            //     // Picking a random item from the pool
+            //     const partnerA = this.matingPool[a];
+            //     const partnerB = this.matingPool[b];
 
-                // Generating a child with DNA crossover
-                var child = partnerA.crossover(partnerB);
+            //     // Generating a child with DNA crossover
+            //     const child = partnerA.crossover(partnerB);
 
-                // Mutate DNA for diversity
-                // child.mutate(this.mutationRate);
+            //     // Mutate DNA for diversity
+            //     // child.mutate(this.mutationRate);
 
-                // Add child to the population
-                _this2.population[i] = child;
-            });
+            //     // Add child to the population
+            //     this.population[i] = child;
+
+            //     // console.log('New child: ', child.fitness, ' from A: ', partnerA.fitness, ' and B: ', partnerB.fitness);
+
+            // });
 
             this.generations += 1;
         }
@@ -21447,6 +21404,55 @@ var Population = function () {
         key: 'getBest',
         value: function getBest() {
             return this.best;
+        }
+    }, {
+        key: 'getLowest',
+        value: function getLowest() {
+            var lowest = Number.POSITIVE_INFINITY;
+            var index = 0;
+
+            this.population.forEach(function (member, i) {
+                if (member.fitness < lowest) {
+                    index = i;
+                    lowest = member.fitness;
+                }
+            });
+
+            this.lowest = lowest;
+
+            return this.population[index].getPhrase();
+        }
+    }, {
+        key: 'getLowestFitness',
+        value: function getLowestFitness() {
+            var lowest = Number.POSITIVE_INFINITY;
+            var index = 0;
+
+            this.population.forEach(function (member, i) {
+                if (member.fitness < lowest) {
+                    index = i;
+                    lowest = member.fitness;
+                }
+            });
+
+            this.lowestFitness = lowest;
+
+            return this.population[index].fitness;
+        }
+    }, {
+        key: 'removeLowestFitnessFromPool',
+        value: function removeLowestFitnessFromPool() {
+            var lowest = Number.POSITIVE_INFINITY;
+            var index = 0;
+
+            this.matingPool.forEach(function (member, i) {
+                if (member.fitness < lowest) {
+                    index = i;
+                    lowest = member.fitness;
+                }
+            });
+
+            this.matingPool.splice(index, 1);
         }
     }, {
         key: 'getRandom',
@@ -21467,19 +21473,9 @@ var Population = function () {
                 }
             });
 
-            // console.log(Math.floor(worldrecord));
-
             // Get best result so far
             this.best = this.population[index].getPhrase();
-
-            // Stop simulation if found result
-            // if (worldrecord === this.perfectScore) this.finished = true;
         }
-
-        // isFinished() {
-        //     return this.finished;
-        // }
-
     }, {
         key: 'getGenerations',
         value: function getGenerations() {
@@ -21563,7 +21559,7 @@ var World = function (_React$Component) {
 
         // Simulation settings
         _this.mutationRate = 0.01;
-        _this.populationSize = 10000;
+        _this.populationSize = 1000;
 
         _this.maxGeneration = 1000;
         _this.currentGeneration = 0;
@@ -21588,9 +21584,14 @@ var World = function (_React$Component) {
         key: 'draw',
         value: function draw() {
 
+            // console.log('Gen: ', this.currentGeneration);
+            // console.log('Worst fitness: ', this.population.getLowestFitness(), 'Length: ', this.population.population.length);
+
+            // console.log('Natural selection');
             // Generate weighed mating pool with the fittest members
             this.population.naturalSelection();
 
+            // console.log('Generate pool');
             // Generate new population of children from parents in the mating pool
             this.population.generate();
 
@@ -21601,21 +21602,16 @@ var World = function (_React$Component) {
             this.population.evaluate();
 
             // If max reached, stop
-            if (this.currentGeneration >= this.maxGeneration) this.running = false;
+            if (this.currentGeneration + 1 > this.maxGeneration - 2) this.running = false;
 
             // Display best result so far
-            this.setState({ result: this.population.getRandom() });
-
-            console.log(this.population.population.map(function (item) {
-                return item.fitness;
-            }));
+            this.setState({ result: this.population.getLowest() });
 
             this.currentGeneration++;
 
-            // console.log('BEST:' , this.state.result.cleng);
-
             // Loop and start new generation
             if (this.running) window.requestAnimationFrame(this.draw);
+            // if (this.running) setTimeout(this.draw, 10);
         }
     }, {
         key: 'render',
@@ -21625,6 +21621,36 @@ var World = function (_React$Component) {
             return _react2.default.createElement(
                 'div',
                 null,
+                _react2.default.createElement(
+                    'div',
+                    { className: 'generation' },
+                    'No. iterations: ',
+                    _react2.default.createElement(
+                        'span',
+                        null,
+                        this.currentGeneration
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'population' },
+                    'Variations left: ',
+                    _react2.default.createElement(
+                        'span',
+                        null,
+                        this.population.population.length
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'score' },
+                    'Lowest fitness score: ',
+                    _react2.default.createElement(
+                        'span',
+                        null,
+                        Math.floor(this.population.getLowestFitness())
+                    )
+                ),
                 _react2.default.createElement(_Element2.default, { dna: this.state.result })
             );
         }
